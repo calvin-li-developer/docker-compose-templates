@@ -1,0 +1,16 @@
+services:
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    network_mode: host
+    environment:
+      - DISABLE_IPV6=true
+    # ports:
+    #  - '80:80' # Public HTTP Port
+    #  - '443:443' # Public HTTPS Port
+    #  - '81:81' # Admin Web Port
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx-data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    restart: unless-stopped

@@ -1,0 +1,36 @@
+# Reference Doc: https://github.com/linuxserver/docker-wireguard
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - SERVERURL=${SERVERURL}
+      - SERVERPORT=${SERVERPORT}
+      - PEERS=${PEERS}
+      - PEERDNS=${PEERDNS}
+      - INTERNAL_SUBNET=${INTERNAL_SUBNET}
+      - ALLOWEDIPS=${ALLOWEDIPS}
+      - LOG_CONFS=${LOG_CONFS}
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - ${SERVERPORT}:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - wireguard_net
+    restart: unless-stopped
+
+networks:
+  wireguard_net:
+    name: wireguard_net
+    external: false
+    driver_opts:
+      com.docker.network.bridge.name: wireguard_net

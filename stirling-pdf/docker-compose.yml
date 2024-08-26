@@ -1,0 +1,16 @@
+# Reference Doc: https://github.com/Stirling-Tools/Stirling-PDF
+services:
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirling-pdf
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./ocr-data:/usr/share/tessdata #Required for extra OCR languages
+      - ./configs:/configs
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - DOCKER_ENABLE_SECURITY=false
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
+      - LANGS=en_GB
+    restart: unless-stopped

@@ -1,0 +1,28 @@
+services:
+  unbound:
+    container_name: unbound
+    image: madnuttah/unbound:latest
+    hostname: unbound
+    network_mode: host
+    environment:
+      TZ: America/New_York
+      UNBOUND_UID: 1000 #optional
+      UNBOUND_GID: 1000 #optional
+      HEALTHCHECK_PORT: 5335 #optional
+      EXTENDED_HEALTHCHECK: true #optional
+      EXTENDED_HEALTHCHECK_DOMAIN: "google.com" #optional
+      DISABLE_SET_PERMS: false
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    volumes:
+      - ./unbound.conf:/usr/local/unbound/unbound.conf:rw
+      - ./conf.d/:/usr/local/unbound/conf.d/:rw
+      - ./log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
+      - ./zones.d/:/usr/local/unbound/zones.d/:rw
+    restart: unless-stopped
+    healthcheck:
+      test: /usr/local/unbound/sbin/healthcheck.sh
+      interval: 60s
+      retries: 5
+      start_period: 15s
+      timeout: 30s

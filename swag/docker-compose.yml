@@ -1,0 +1,18 @@
+# Ref Doc: https://github.com/linuxserver/docker-swag
+services:
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - URL=yourdomain.url
+      - SUBDOMAINS=wildcard
+      - VALIDATION=duckdns
+      - DUCKDNSTOKEN=myduckdnstoken
+    volumes:
+      - ./config:/config
+    restart: unless-stopped

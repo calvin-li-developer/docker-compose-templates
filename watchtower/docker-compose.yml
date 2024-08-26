@@ -1,0 +1,16 @@
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    command: [ "--debug", "--cleanup", "--schedule", "0 30 5 * * *" ]
+    networks:
+      - watchtower-network
+
+networks:
+  watchtower-network:
+    name: watchtower-network
+    external: false
