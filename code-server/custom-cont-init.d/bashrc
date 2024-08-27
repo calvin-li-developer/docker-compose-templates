@@ -1,0 +1,12 @@
+# Function to check and start SSH agent
+function abc_set_ssh_agent {   
+    if [ -n "$SSH_AGENT_PID" ] && [ -S "$SSH_AUTH_SOCK" ]; then
+        :
+    else
+        eval "$(ssh-agent -s)" > /dev/null 2>&1
+        ssh-add /config/.ssh/code-server-ansible > /dev/null 2>&1
+        ssh-add /config/.ssh/ansible > /dev/null 2>&1
+    fi
+}
+
+PROMPT_COMMAND='abc_set_ssh_agent'

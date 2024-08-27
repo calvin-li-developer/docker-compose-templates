@@ -1,0 +1,23 @@
+# Ref Doc: https://github.com/linuxserver/docker-syncthing
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    environment:
+      - PUID=1026
+      - PGID=100
+      - TZ=America/Toronto
+    volumes:
+      - "./config:/config"
+      - "/volume1/docker/mega.syno/MEGA/OCI Services/:/data"
+    ports:
+      - 8384:8384
+    restart: unless-stopped
+    networks:
+      - syncthing-network
+
+networks:
+  syncthing-network:
+    name: syncthing-network
+    external: false

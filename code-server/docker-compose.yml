@@ -1,0 +1,29 @@
+# Ref Doc: https://github.com/linuxserver/docker-code-server
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    hostname: code-server
+    deploy:
+      resources:
+        limits:
+          memory: "6G"
+    env_file:
+      - base-docker.env
+      - ansible.env
+      - github.env
+    volumes:
+      - ./config:/config
+      - ./workspace:/config/workspace
+      - /volume1/homes/MagikWarden/.ssh:/config/.ssh
+      - ./custom-cont-init.d:/custom-cont-init.d:ro
+    ports:
+      - 8443:8443
+    networks:
+      - code-server-network
+    restart: unless-stopped
+
+networks:
+  code-server-network:
+    name: code-server-network
+    external: false
