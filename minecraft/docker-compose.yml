@@ -1,0 +1,73 @@
+services:
+  mc:
+    container_name: mc-server-${VERSION}
+    image: itzg/minecraft-server:latest
+    environment:
+      - UID=${UID}
+      - GID=${GID}
+      - EULA=${EULA}
+      - VERSION=${VERSION}
+      - TYPE=${TYPE}
+      - MEMORY=${MEMORY}
+      - INIT_MEMORY=${INIT_MEMORY}
+      - MAX_PLAYERS=${MAX_PLAYERS}
+      - MOTD=${MOTD}
+      - DIFFICULTY=${DIFFICULTY}
+      - LOG_TIMESTAMP=${LOG_TIMESTAMP}
+      - JVM_DD_OPTS=${JVM_DD_OPTS}
+      - MAX_TICK_TIME=${MAX_TICK_TIME}
+      - ENABLE_WHITELIST=${ENABLE_WHITELIST}
+      - ENFORCE_WHITELIST=${ENFORCE_WHITELIST}
+      - WHITELIST_FILE=/resources/whitelist.json
+      - EXISTING_WHITELIST_FILE=${EXISTING_WHITELIST_FILE}
+      - RCON_CMDS_STARTUP=${RCON_CMDS_STARTUP}
+      - RCON_PASSWORD=${RCON_PASSWORD}
+      - VIEW_DISTANCE=${VIEW_DISTANCE}
+      - SIMULATION_DISTANCE=${VIEW_DISTANCE}
+      - ENABLE_QUERY=${ENABLE_QUERY}
+      - ENABLE_AUTOPAUSE=${ENABLE_AUTOPAUSE}
+      - AUTOPAUSE_TIMEOUT_INIT=${AUTOPAUSE_TIMEOUT_INIT}
+      - AUTOPAUSE_TIMEOUT_EST=${AUTOPAUSE_TIMEOUT_EST}
+      - PAPER_CHANNEL=${PAPER_CHANNEL}
+      - PLUGINS_FILE=/extras/plugins.txt
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    tty: true
+    stdin_open: true
+    ports:
+      - ${SERVER_PORT}:25565
+    restart: unless-stopped
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - ./config:/data
+      - ./extras/whitelist.json:/resources/whitelist.json:ro
+      - ./extras/plugins.txt:/extras/plugins.txt:ro
+    networks:
+      - mc-network
+
+  backups:
+    container_name: mc-server-${VERSION}-backup
+    image: itzg/mc-backup
+    environment:
+      - PRUNE_BACKUPS_DAYS=${PRUNE_BACKUPS_DAYS}
+      - BACKUP_INTERVAL=${BACKUP_INTERVAL}
+      - RCON_HOST=mc
+      - RCON_PASSWORD=${RCON_PASSWORD}
+      - POST_BACKUP_SCRIPT_FILE=/post-backup.sh
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    restart: unless-stopped
+    depends_on:
+      - mc
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - ./mc-backups:/backups
+      - ./config:/data:ro
+      - ./post-backup.sh:/post-backup.sh:ro
+    networks:
+      - mc-network
+
+networks:
+  mc-network:
+    name: mc-${VERSION}-network
+    external: false

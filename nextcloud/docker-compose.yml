@@ -1,0 +1,81 @@
+services:
+  nextcloud:
+    image: lscr.io/linuxserver/nextcloud:latest
+    container_name: nextcloud
+    hostname: nextcloud
+    deploy:
+      resources:
+        limits:
+          cpus: ${NC_CPU}
+          memory: ${NC_MEMORY}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    ports:
+      - ${NEXTCLOUD_PORT}:443
+    healthcheck:
+      test: ["CMD", "occ", "status"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+    restart: unless-stopped
+    depends_on:
+      - nextcloud_db
+      - nextcloud_valkey
+
+  nextcloud_valkey:
+    image: valkey/valkey:alpine
+    container_name: nextcloud-valkey
+    restart: unless-stopped
+
+  nextcloud_db:
+    image: postgres:15-alpine
+    container_name: nextcloud-database
+    user: ${PUID}:${PGID} # for non root user use sudo chown -R $USER:$USER ./database && sudo chmod -R 775 ./database then rerun docker compose up -d --force-recreate
+    environment:
+      - PGDATA=/var/lib/postgresql/data
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  nextcloud_cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: nextcloud-cloudflared
+    restart: unless-stopped
+    read_only: true
+    volumes:
+      - ./cloudflared-config:/root/.cloudflared/
+    command: [ "tunnel","--config", "/root/.cloudflared/config.yml", "run", "${TUNNEL_ID}" ]
+    user: root
+    depends_on:
+      - nextcloud
+
+  nextcloud_fail2ban:
+    image: lscr.io/linuxserver/fail2ban:latest
+    container_name: nextcloud-fail2ban
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERBOSITY=${VERBOSITY}
+    volumes:
+      - ./fail2ban-config:/config
+      - /var/log:/var/log:ro
+      - ./config/log:/remotelogs/nextcloud:ro
+    restart: unless-stopped

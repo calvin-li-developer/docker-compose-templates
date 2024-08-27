@@ -1,0 +1,88 @@
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack
+    container_name: bookstack
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU}
+          memory: ${MEMORY}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - APP_TIMEZONE=${TZ}
+      - APP_URL="${APP_URL}"
+      - DB_HOST=bookstack-database
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - STORAGE_TYPE=${STORAGE_TYPE}
+      - APP_PROXIES=${APP_PROXIES}
+      - CACHE_DRIVER=${CACHE_DRIVER}
+      - SESSION_DRIVER=${SESSION_DRIVER}
+      - REDIS_SERVERS=bookstack-valkey:6379:0
+      - APP_DEFAULT_DARK_MODE=${APP_DEFAULT_DARK_MODE}
+      - LOG_FAILED_LOGIN_MESSAGE=${LOG_FAILED_LOGIN_MESSAGE}
+      - SESSION_SECURE_COOKIE=${SESSION_SECURE_COOKIE}
+      - SESSION_LIFETIME=${SESSION_LIFETIME}
+    volumes:
+      - ./config:/config
+    ports:
+      - ${BOOKSTACK_PORT}:80
+    restart: unless-stopped
+    depends_on:
+      - bookstack_db
+      - bookstack_valkey
+  bookstack_valkey:
+    image: valkey/valkey:alpine
+    container_name: bookstack-valkey
+    restart: unless-stopped
+  bookstack_db:
+    image: lscr.io/linuxserver/mariadb:10.11.6
+    container_name: bookstack-database
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU}
+          memory: ${MEMORY}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - ./database:/config
+    restart: unless-stopped
+
+  bookstack_fail2ban:
+    image: lscr.io/linuxserver/fail2ban:latest
+    container_name: bookstack-fail2ban
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERBOSITY=${VERBOSITY}
+    volumes:
+      - ./config:/config
+      - /var/log:/var/log:ro
+      - ./fail2ban-config/log:/remotelogs/bookstack:ro
+    restart: unless-stopped
+
+  bookstack_cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bookstack-cloudflared
+    restart: unless-stopped
+    read_only: true
+    volumes:
+      - ./cloudflared-config:/root/.cloudflared/
+    command: [ "tunnel","--config", "/root/.cloudflared/config.yml", "run", "${TUNNEL_ID}" ]
+    user: root
+    depends_on:
+      - bookstack

@@ -1,0 +1,3 @@
+https://hangarcdn.papermc.io/plugins/kennytv/Maintenance/versions/4.2.1/PAPER/Maintenance-4.2.1.jar
+https://download.luckperms.net/1552/bukkit/loader/LuckPerms-Bukkit-5.4.137.jar
+https://hangarcdn.papermc.io/plugins/JainaGamer45/WelcomerPlus/versions/1.1.6/PAPER/WelcomerPlus-1.1.6.jar
