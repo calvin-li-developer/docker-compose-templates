@@ -1,0 +1,84 @@
+services:
+  # Ref Doc: https://github.com/dani-garcia/vaultwarden
+  vaultwarden:
+    restart: unless-stopped
+    container_name: vaultwarden
+    image: vaultwarden/server:alpine
+    volumes:
+      - ./vaultwarden-config:/data/
+    environment:
+      #- ADMIN_TOKEN=${ADMIN_TOKEN}
+      - IP_HEADER=${IP_HEADER}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - SMTP_SECURITY=${SMTP_SECURITY}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_TIMEOUT=${SMTP_TIMEOUT}
+      - SMTP_AUTH_MECHANISM="${SMTP_AUTH_MECHANISM}"
+      - EXPERIMENTAL_CLIENT_FEATURE_FLAGS=${EXPERIMENTAL_CLIENT_FEATURE_FLAGS}
+      - LOGIN_RATELIMIT_MAX_BURST=${LOGIN_RATELIMIT_MAX_BURST}
+      - LOGIN_RATELIMIT_SECONDS=${LOGIN_RATELIMIT_SECONDS}
+      - DOMAIN=${DOMAIN}
+      - PUSH_ENABLED=${PUSH_ENABLED}
+      - PUSH_INSTALLATION_ID=${PUSH_INSTALLATION_ID}
+      - PUSH_INSTALLATION_KEY=${PUSH_INSTALLATION_KEY}
+      - INVITATION_ORG_NAME=${INVITATION_ORG_NAME}
+      - INVITATIONS_ALLOWED=${INVITATIONS_ALLOWED}
+      - SIGNUPS_ALLOWED=${SIGNUPS_ALLOWED}
+      - SIGNUPS_VERIFY=${SIGNUPS_VERIFY}
+      - SIGNUPS_VERIFY_RESEND_TIME=${SIGNUPS_VERIFY_RESEND_TIME}
+      - SIGNUPS_VERIFY_RESEND_LIMIT=${SIGNUPS_VERIFY_RESEND_LIMIT}
+      - EMERGENCY_ACCESS_ALLOWED=${EMERGENCY_ACCESS_ALLOWED}
+      - SENDS_ALLOWED=${SENDS_ALLOWED}
+      # LOG_LEVEL= "trace", "debug", "info", "warn", "error" and "off"
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FILE=${LOG_FILE}
+      - TZ=${TZ}
+    networks:
+      - vaultwarden-network
+  
+  # Ref Doc: https://thedxt.ca/2022/10/cloudflare-tunnel-with-docker/
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: vaultwarden-cloudflared
+    restart: unless-stopped
+    read_only: true
+    volumes:
+      - ./cloudflared-config:/root/.cloudflared/
+    command: [ "tunnel", "run", "${TUNNEL_ID}" ]
+    user: root
+    depends_on:
+      - vaultwarden
+    networks:
+      - vaultwarden-network
+
+  # Ref Doc: https://github.com/linuxserver/docker-fail2ban
+  fail2ban:
+    image: lscr.io/linuxserver/fail2ban:latest
+    container_name: vaultwarden-fail2ban
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    depends_on:
+      - vaultwarden
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERBOSITY=${VERBOSITY}
+    volumes:
+      - ./fail2ban-config:/config
+      - /var/log:/var/log:ro
+      - ./vaultwarden-config:/remotelogs/vaultwarden:ro
+    restart: unless-stopped
+
+networks:
+  vaultwarden-network:
+    name: vaultwarden-network
+    external: false
+    driver_opts:
+      com.docker.network.bridge.name: vaultwarden_net
