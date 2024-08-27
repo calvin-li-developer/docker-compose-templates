@@ -1,0 +1,21 @@
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    deploy:
+      resources:
+        limits:
+          memory: "2G"
+    network_mode: host
+    environment:
+      - PUID=1026
+      - PGID=101
+      - TZ=America/Toronto
+      - VERSION=latest
+    volumes:
+      - /volume1/docker/plex/handbrake:/handbrake:ro
+      - /volume1/docker/plex/media:/data:ro
+      - /volume1/docker/plex/config:/config
+    devices:
+       - /dev/dri:/dev/dri # For H/W transcoding
+    restart: unless-stopped
