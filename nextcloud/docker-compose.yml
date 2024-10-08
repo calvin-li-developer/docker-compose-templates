@@ -3,6 +3,9 @@ services:
     image: lscr.io/linuxserver/nextcloud:latest
     container_name: nextcloud
     hostname: nextcloud
+    networks:
+      - public
+      - private
     deploy:
       resources:
         limits:
@@ -12,6 +15,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - DOCKER_MODS=${DOCKER_MODS}
     volumes:
       - ./config:/config
       - ./data:/data
@@ -30,11 +34,15 @@ services:
   nextcloud_valkey:
     image: valkey/valkey:alpine
     container_name: nextcloud-valkey
+    networks:
+      - private
     restart: unless-stopped
 
   nextcloud_db:
     image: postgres:15-alpine
     container_name: nextcloud-database
+    networks:
+      - private
     user: ${PUID}:${PGID} # for non root user use sudo chown -R $USER:$USER ./database && sudo chmod -R 775 ./database then rerun docker compose up -d --force-recreate
     environment:
       - PGDATA=/var/lib/postgresql/data
@@ -53,6 +61,8 @@ services:
   nextcloud_cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: nextcloud-cloudflared
+    networks:
+      - public
     restart: unless-stopped
     read_only: true
     volumes:
@@ -79,3 +89,11 @@ services:
       - /var/log:/var/log:ro
       - ./config/log:/remotelogs/nextcloud:ro
     restart: unless-stopped
+
+# Networks public / private if not attached to host
+networks:
+  public:
+    name: ${APP_NAME}-public
+  private:
+    name: ${APP_NAME}-private
+    internal: true

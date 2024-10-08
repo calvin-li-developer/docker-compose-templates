@@ -2,6 +2,9 @@ services:
   bookstack:
     image: lscr.io/linuxserver/bookstack
     container_name: bookstack
+    networks:
+      - public
+      - private
     deploy:
       resources:
         limits:
@@ -10,7 +13,8 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - APP_TIMEZONE=${TZ}
+      - DOCKER_MODS=${DOCKER_MODS}
+      - APP_TIMEZONE=${APP_TIMEZONE}
       - APP_URL="${APP_URL}"
       - DB_HOST=bookstack-database
       - DB_USER=${MYSQL_USER}
@@ -36,10 +40,14 @@ services:
   bookstack_valkey:
     image: valkey/valkey:alpine
     container_name: bookstack-valkey
+    networks:
+      - private
     restart: unless-stopped
   bookstack_db:
     image: lscr.io/linuxserver/mariadb:10.11.6
     container_name: bookstack-database
+    networks:
+      - private
     deploy:
       resources:
         limits:
@@ -70,14 +78,16 @@ services:
       - TZ=${TZ}
       - VERBOSITY=${VERBOSITY}
     volumes:
-      - ./config:/config
+      - ./fail2ban-config:/config
       - /var/log:/var/log:ro
-      - ./fail2ban-config/log:/remotelogs/bookstack:ro
+      - ./config/log:/remotelogs/bookstack:ro
     restart: unless-stopped
 
   bookstack_cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: bookstack-cloudflared
+    networks:
+      - public
     restart: unless-stopped
     read_only: true
     volumes:
@@ -86,3 +96,11 @@ services:
     user: root
     depends_on:
       - bookstack
+
+# Networks public / private if not attached to host
+networks:
+  public:
+    name: ${APP_NAME}-public
+  private:
+    name: ${APP_NAME}-private
+    internal: true
