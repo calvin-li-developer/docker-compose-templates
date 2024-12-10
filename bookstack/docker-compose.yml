@@ -37,12 +37,14 @@ services:
     depends_on:
       - bookstack_db
       - bookstack_valkey
+  
   bookstack_valkey:
     image: valkey/valkey:alpine
     container_name: bookstack-valkey
     networks:
       - private
     restart: unless-stopped
+  
   bookstack_db:
     image: lscr.io/linuxserver/mariadb:10.11.6
     container_name: bookstack-database
