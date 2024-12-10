@@ -7,8 +7,8 @@ services:
     volumes:
       - ./app-config/work:/opt/adguardhome/work
       - ./app-config/conf:/opt/adguardhome/conf
-      - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/37myhomelab.duckdns.org/fullchain.pem:/certs/fullchain.pem:ro
-      - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/37myhomelab.duckdns.org/privkey.pem:/certs/privkey.pem:ro
+      - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/${DOMAIN}/fullchain.pem:/certs/fullchain.pem:ro
+      - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/${DOMAIN}/privkey.pem:/certs/privkey.pem:ro
     restart: unless-stopped
   
   # Ref Doc: https://github.com/linuxserver/docker-adguardhome-sync
@@ -24,8 +24,4 @@ services:
     volumes:
       - ./sync-config:/config
     restart: unless-stopped
-
-networks:
-  watchtower-network:
-    name: watchtower-network
-    external: false
+    
