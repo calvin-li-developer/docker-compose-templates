@@ -1,12 +1,65 @@
 services:
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
+    privileged: true
+    read_only: true
+    tmpfs:
+      - /run
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    networks:
+      - watchtower-network
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - DISABLE_IPV6=1
+      # Default Enable
+      - LOG_LEVEL=info
+      - PING=1
+      - EVENTS=1
+      - VERSION=1
+      # Enable for Watchtower
+      - POST=1
+      - CONTAINERS=1
+      - IMAGES=1
+      # Default Disable
+      - INFO=0
+      - ALLOW_START=0
+      - ALLOW_STOP=0
+      - ALLOW_RESTARTS=0
+      - AUTH=0
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - DISTRIBUTION=0
+      - EXEC=0
+      - NETWORKS=0
+      - NODES=0
+      - PLUGINS=0
+      - SECRETS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - VOLUMES=0
+
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
+    environment:
+      - DOCKER_HOST=tcp://socket-proxy:2375
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE=0 30 5 * * *
+      - WATCHTOWER_LOG_LEVEL=debug
+      - WATCHTOWER_LOG_FORMAT=LogFmt
+    depends_on:
+      - socket-proxy
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    command: [ "--debug", "--cleanup", "--schedule", "0 30 5 * * *" ]
     networks:
       - watchtower-network
 
