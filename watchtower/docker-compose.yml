@@ -27,10 +27,10 @@ services:
       - CONTAINERS=1
       - IMAGES=1
       - ALLOW_RESTARTS=1
+      - ALLOW_START=1
+      - ALLOW_STOP=1
       # Default Disable
       - INFO=0
-      - ALLOW_START=0
-      - ALLOW_STOP=0
       - AUTH=0
       - BUILD=0
       - COMMIT=0
