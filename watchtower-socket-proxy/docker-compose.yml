@@ -1,0 +1,58 @@
+services:
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
+    hostname: socket-proxy
+    privileged: true
+    read_only: true
+    tmpfs:
+      - /run
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    networks:
+      - watchtower-network
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - DISABLE_IPV6=1
+      - LOG_LEVEL=info
+      - PING=1
+      - EVENTS=1
+      - VERSION=1
+      # Enable for Watchtower
+      - POST=1
+      - INFO=1
+      - SERVICES=1
+      - CONTAINERS=1
+      - VOLUMES=1
+      - IMAGES=1
+      - NETWORKS=1
+      - TASKS=1
+      - ALLOW_RESTARTS=1
+      - ALLOW_START=1
+      - ALLOW_STOP=1
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    environment:
+      - DOCKER_HOST=tcp://socket-proxy:2375
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE=0 30 5 * * *
+      - WATCHTOWER_LOG_LEVEL=debug
+      - WATCHTOWER_LOG_FORMAT=LogFmt
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+    depends_on:
+      - socket-proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    networks:
+      - watchtower-network
+
+networks:
+  watchtower-network:
+    name: watchtower-network
+    external: false
