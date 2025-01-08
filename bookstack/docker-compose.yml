@@ -42,6 +42,8 @@ services:
     image: valkey/valkey:alpine
     hostname: bookstack-valkey
     container_name: bookstack-valkey
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - private
     restart: unless-stopped

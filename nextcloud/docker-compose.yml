@@ -35,6 +35,8 @@ services:
     image: valkey/valkey:alpine
     hostname: nextcloud-valkey
     container_name: nextcloud-valkey
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - private
     restart: unless-stopped
