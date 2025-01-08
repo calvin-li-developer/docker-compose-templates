@@ -33,6 +33,7 @@ services:
 
   nextcloud_valkey:
     image: valkey/valkey:alpine
+    hostname: nextcloud-valkey
     container_name: nextcloud-valkey
     networks:
       - private
