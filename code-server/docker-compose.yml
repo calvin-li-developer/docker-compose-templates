@@ -4,21 +4,31 @@ services:
     image: lscr.io/linuxserver/code-server:latest
     container_name: code-server
     hostname: code-server
-    deploy:
-      resources:
-        limits:
-          memory: "6G"
-    env_file:
-      - base-docker.env
-      - ansible.env
-      - github.env
+    environment:
+      # Defaults
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=${DOCKER_MODS}
+      - INSTALL_PIP_PACKAGES=${INSTALL_PIP_PACKAGES}
+      - INSTALL_PACKAGES=${INSTALL_PACKAGES}
+      # Ansible
+      - ANSIBLE_HOST_KEY_CHECKING=${ANSIBLE_HOST_KEY_CHECKING}
+      - ANSIBLE_BECOME_PASSWORD_FILE=${ANSIBLE_BECOME_PASSWORD_FILE}
+      # GitHub Project Misc
+      - REACT_APP_API_KEY=${REACT_APP_API_KEY}
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
     volumes:
       - ./config:/config
       - ./workspace:/config/workspace
-      - /volume1/homes/MagikWarden/.ssh:/config/.ssh
       - ./custom-cont-init.d:/custom-cont-init.d:ro
+      # SECRETS
+      - ./secrets/:/secrets
+      # SSH KEYS
+      - ./dotssh/ansible:/config/.ssh/ansible
+      - ./dotssh/ansible.pub:/config/.ssh/ansible.pub
     ports:
-      - 8443:8443
+      - 7443:8443
     networks:
       - code-server-network
     restart: unless-stopped
