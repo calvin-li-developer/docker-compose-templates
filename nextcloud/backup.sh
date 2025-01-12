@@ -1,6 +1,6 @@
 #!/bin/bash
 version=`docker inspect nextcloud -f '{{json .Config.Labels}}' | jq -r '.["org.opencontainers.image.version"]'`
-NEXTCLOUD_USER=`docker exec -it nextcloud occ user:list | tr -d ' \t' | awk -F: '{print $2}'`
+NEXTCLOUD_USER=`docker exec -it nextcloud occ user:list | tr -d ' \t\r' | awk -F: '{print $2}'`
 echo "Nextcloud Version: $version"
 
 echo "Stop Nextcloud docker ..." && docker stop nextcloud nextcloud-database > /dev/null
@@ -27,7 +27,7 @@ if [ "$(ls -1qAR $target_dir | grep nc | wc -l)" -gt $max_num_backups ]; then
     echo "Backup tar files in $target_dir exceeded $max_num_backups"
     echo "Oldest file removed is $oldest_file"
     # Delete the oldest file
-    rm "$target_dir/${version%%-*}/$oldest_file"
+    rm -f "$target_dir/${version%%-*}/$oldest_file"
 fi
 
 echo "Start Nextcloud docker ..." && docker start nextcloud nextcloud-database
