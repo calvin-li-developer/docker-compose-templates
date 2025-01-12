@@ -1,6 +1,6 @@
 #!/bin/bash
 version=`docker inspect nextcloud -f '{{json .Config.Labels}}' | jq -r '.["org.opencontainers.image.version"]'`
-
+NEXTCLOUD_USER=`docker exec -it nextcloud occ user:list | tr -d ' \t' | awk -F: '{print $2}'`
 echo "Nextcloud Version: $version"
 
 echo "Stop Nextcloud docker ..." && docker stop nextcloud nextcloud-database > /dev/null
