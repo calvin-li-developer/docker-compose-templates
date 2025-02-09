@@ -1,4 +1,5 @@
-## Create container via dns validation with a wildcard cert¶
+## Create container via dns validation with a wildcard cert 
+Ref: [SWAG Doc](https://docs.linuxserver.io/general/swag/#create-container-via-dns-validation-with-a-wildcard-cert)
 
 Let's assume our domain name is linuxserver-test.com and we would like our cert to also cover www.linuxserver-test.com, ombi.linuxserver-test.com and any other subdomain possible. On the router, we'll forward port 443 to our host server (Port 80 forwarding is optional).
 
