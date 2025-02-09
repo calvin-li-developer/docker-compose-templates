@@ -6,13 +6,13 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
-      - URL=yourdomain.url
-      - SUBDOMAINS=wildcard
-      - VALIDATION=duckdns
-      - DUCKDNSTOKEN=myduckdnstoken
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - URL=${URL}
+      - SUBDOMAINS=${SUBDOMAINS}
+      - DNSPLUGIN=${DNSPLUGIN}
+      - VALIDATION=${VALIDATION}
     volumes:
-      - ./config:/config
+      - ./swag-config:/config
     restart: unless-stopped
