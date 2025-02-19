@@ -2,6 +2,8 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
+    security_opt:
+      - no-new-privileges=true
     # cpuset: "0"    # Use for Synology DSM
     # cpu_shares: 2  # Use for Synology DSM
     deploy:
