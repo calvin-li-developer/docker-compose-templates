@@ -4,6 +4,8 @@ services:
     restart: unless-stopped
     container_name: vaultwarden
     image: vaultwarden/server:alpine
+    security_opt:
+      - no-new-privileges=true
     volumes:
       - ./vaultwarden-config:/data/
     environment:
@@ -44,6 +46,8 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: vaultwarden-cloudflared
+    security_opt:
+      - no-new-privileges=true
     restart: unless-stopped
     read_only: true
     volumes:
@@ -59,6 +63,8 @@ services:
   fail2ban:
     image: lscr.io/linuxserver/fail2ban:latest
     container_name: vaultwarden-fail2ban
+    security_opt:
+      - no-new-privileges=true
     cap_add:
       - NET_ADMIN
       - NET_RAW
