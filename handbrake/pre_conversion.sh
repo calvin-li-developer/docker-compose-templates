@@ -34,8 +34,10 @@ if [ "$(find "$WATCH_FOLDER_MOVIES" -type f -name "*.mp4" | wc -l)" -gt 0 ] || [
     year=$(ffprobe -v quiet -print_format json -show_format -show_streams "$file" | jq -r '.format.tags.date' | cut -c 1-4)
     echo "[INFO(pre_conversion.sh)] => Movie Year: $year"
     format_name=${name// /+}
-    # Check audio count
-    audio_count=$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$file" | wc -l)
+
+    # Check audio source/channel count
+    audio_source_count=$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$file" | wc -l)
+    audio_channel_count=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=noprint_wrappers=1:nokey=1 "$file")
 
     query=$(curl -s "http://www.omdbapi.com/?apikey=$API_KEY&t=$format_name&y=$year")
     response=$(echo "$query" | jq -r '.Response')
@@ -50,9 +52,12 @@ if [ "$(find "$WATCH_FOLDER_MOVIES" -type f -name "*.mp4" | wc -l)" -gt 0 ] || [
     year=$(echo "$query" | jq -r '.Year')
     # Rename the file with the new format
     echo "[INFO(pre_conversion.sh)] => Audio Count: $audio_count"
-    if [[ "$audio_count" -eq 1 ]]; then
+    if [[ "$audio_source_count" -eq 1 ]] && [[ "$audio_channel_count" -eq 2 ]]; then
         echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) [S] {imdb-$imdb_id}.mp4"
         mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) [S] {imdb-$imdb_id}.mp4"
+    elif [[ "$audio_source_count" -eq 1 ]] && [[ "$audio_channel_count" -gt 2 ]]; then
+        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) [SR] {imdb-$imdb_id}.mp4"
+        mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) [SR] {imdb-$imdb_id}.mp4"
     else
         echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) {imdb-$imdb_id}.mp4"
         mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) {imdb-$imdb_id}.mp4"
@@ -135,7 +140,10 @@ rm -rf "output"
 ### PLEX REFRESH SECTION
 
 echo "[INFO(pre_conversion.sh)] => Refreshing Plex Libraries ..."
-# Can find library sections id in the Plex Server XML file
 curl -X GET -f -s "http://$PLEX_URL/library/sections/1/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies ..."
 curl -X GET -f -s "http://$PLEX_URL/library/sections/29/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies_NSFW ..."
 curl -X GET -f -s "http://$PLEX_URL/library/sections/2/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning TV Shows ..."
+
+curl -X PUT http://$PLEX_URL/library/sections/1/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies ..."
+curl -X PUT http://$PLEX_URL/library/sections/29/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies_NSFW ..."
+curl -X PUT http://$PLEX_URL/library/sections/2/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for TV Shows ..."
