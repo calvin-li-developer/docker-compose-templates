@@ -3,9 +3,8 @@ services:
   handbrake:
     image: jlesage/handbrake
     container_name: handbrake
-    restart: no
+    restart: always
     hostname: handbrake
-    network_mode: host
     environment:
       - USER_ID=${USER_ID}
       - GROUP_ID=${GROUP_ID}
@@ -13,6 +12,7 @@ services:
       - DARK_MODE=${DARK_MODE}
       - DISPLAY_WIDTH=${DISPLAY_WIDTH}
       - DISPLAY_HEIGHT=${DISPLAY_HEIGHT}
+      - AUTOMATED_CONVERSION_MAX_WATCH_FOLDERS=${AUTOMATED_CONVERSION_MAX_WATCH_FOLDERS}
       - AUTOMATED_CONVERSION_OUTPUT_SUBDIR=SAME_AS_SRC
       - AUTOMATED_CONVERSION_OUTPUT_SUBDIR_2=SAME_AS_SRC
       - AUTOMATED_CONVERSION_OUTPUT_SUBDIR_3=SAME_AS_SRC
@@ -30,7 +30,7 @@ services:
       - AUTOMATED_CONVERSION_OUTPUT_DIR_3=/output3
       - AUTOMATED_CONVERSION_OUTPUT_DIR_4=/output4
       - AUTOMATED_CONVERSION_OUTPUT_DIR_5=/output3
-      - AUTOMATED_CONVERSION_OUTPUT_DIR_6=/output4
+      - AUTOMATED_CONVERSION_OUTPUT_DIR_6=/output
       - AUTOMATED_CONVERSION_PRESET=${AUTOMATED_CONVERSION_PRESET}
       - AUTOMATED_CONVERSION_PRESET_2=${AUTOMATED_CONVERSION_PRESET}
       - AUTOMATED_CONVERSION_PRESET_3=${AUTOMATED_CONVERSION_PRESET}
@@ -56,6 +56,8 @@ services:
       - PLEX_TOKEN=${PLEX_TOKEN}
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+    ports:
+      - 5800:5800/tcp
     volumes:
       # handbrake paths
       - ./config:/config:rw
