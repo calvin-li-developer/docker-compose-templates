@@ -1,0 +1,12 @@
+services:
+  it-tools:
+    image: 'corentinth/it-tools:latest'
+    container_name: it-tools
+    networks:
+    - public
+    restart: unless-stopped
+
+# Networks public / private if not attached to host
+networks:
+  public:
+    name: ${APP_NAME}-public
