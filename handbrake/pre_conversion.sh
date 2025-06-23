@@ -140,10 +140,10 @@ rm -rf "output"
 ### PLEX REFRESH SECTION
 
 echo "[INFO(pre_conversion.sh)] => Refreshing Plex Libraries ..."
-curl -X GET -f -s "http://$PLEX_URL/library/sections/1/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies ..."
-curl -X GET -f -s "http://$PLEX_URL/library/sections/29/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies_NSFW ..."
-curl -X GET -f -s "http://$PLEX_URL/library/sections/2/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning TV Shows ..."
+curl -k -X GET -f -s "https://$PLEX_URL/library/sections/1/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies ..."
+curl -k -X GET -f -s "https://$PLEX_URL/library/sections/29/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies_NSFW ..."
+curl -k -X GET -f -s "https://$PLEX_URL/library/sections/2/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning TV Shows ..."
 
-curl -X PUT http://$PLEX_URL/library/sections/1/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies ..."
-curl -X PUT http://$PLEX_URL/library/sections/29/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies_NSFW ..."
-curl -X PUT http://$PLEX_URL/library/sections/2/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for TV Shows ..."
+curl -k -X PUT https://$PLEX_URL/library/sections/1/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies ..."
+curl -k -X PUT https://$PLEX_URL/library/sections/29/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for Movies_NSFW ..."
+curl -k -X PUT https://$PLEX_URL/library/sections/2/emptyTrash?X-Plex-Token=$PLEX_TOKEN || echo "[ERROR(pre_conversion.sh)] => Error Empty Trash for TV Shows ..."
