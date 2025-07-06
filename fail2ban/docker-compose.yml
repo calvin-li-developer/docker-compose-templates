@@ -3,6 +3,8 @@ services:
   fail2ban:
     image: lscr.io/linuxserver/fail2ban:latest
     container_name: fail2ban
+    security_opt:
+      - no-new-privileges=true
     cap_add:
       - NET_ADMIN
       - NET_RAW
