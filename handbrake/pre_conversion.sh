@@ -138,6 +138,7 @@ done
 rm -rf "output"
 
 ### PLEX REFRESH SECTION
+# if docker network internal is set to true comment out all the below lines.
 
 echo "[INFO(pre_conversion.sh)] => Refreshing Plex Libraries ..."
 curl -k -X GET -f -s "https://$PLEX_URL/library/sections/1/refresh?force=0&X-Plex-Token=$PLEX_TOKEN" || echo "[ERROR(pre_conversion.sh)] => Error Scanning Movies ..."
