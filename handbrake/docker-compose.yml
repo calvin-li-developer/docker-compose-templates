@@ -61,7 +61,7 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
-      - public
+      - net
     ports:
       - 5800:5800/tcp
     volumes:
@@ -80,6 +80,8 @@ services:
       - ./media/TV Shows_NSFW/:/output4:rw
 
 networks:
-  public:
-    name: handbrake-public
+  net:
+    name: handbrake-net
     enable_ipv6: false
+    # set the below to true after container creation need to install some packages for certain automation to work
+    internal: true
