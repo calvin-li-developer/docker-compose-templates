@@ -84,4 +84,5 @@ networks:
     name: handbrake-net
     enable_ipv6: false
     # set the below to true after container creation need to install some packages for certain automation to work
-    internal: true
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
