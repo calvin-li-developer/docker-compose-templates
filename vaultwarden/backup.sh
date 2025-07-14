@@ -27,7 +27,7 @@ sudo tar -czf "$zip_file" -C "$folder_path" $backup_paths
 
 if [ "$(ls -1qAR $target_dir | grep 'vault-' | wc -l)" -gt $max_num_backups ]; then
     # Get the oldest file in the directory
-    oldest_file="$(ls -1tR $target_dir | grep vault | tail -1 | awk '{print $NF}')"
+    oldest_file="$(ls -1tR $target_dir | grep 'vault-' | tail -1 | awk '{print $NF}')"
     path_to_oldest_file=`find "$HOME/docker/vaultwarden/backups" -name "$oldest_file" -type f`
     echo "Backup tar files in $target_dir exceeded $max_num_backups"
     echo "Oldest file removed is $oldest_file"
