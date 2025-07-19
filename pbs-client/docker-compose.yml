@@ -8,6 +8,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - TZ=${TZ}
       - UNENCRYPTED=${UNENCRYPTED}
       - PBS_ENDPOINT=${PBS_ENDPOINT}
       - PBS_DATASTORE=${PBS_DATASTORE}
