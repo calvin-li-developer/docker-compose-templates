@@ -2,7 +2,7 @@ services:
   pbs-client:
     image: aterfax/pbs-client
     container_name: proxmox-backup-client
-    hostname: dns-server1
+    hostname: ${PROXMOX_CLIENT_NAME}
     labels:
       - com.centurylinklabs.watchtower.enable=false
     depends_on:
