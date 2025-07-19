@@ -6,6 +6,8 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=false
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - UNENCRYPTED=${UNENCRYPTED}
       - PBS_ENDPOINT=${PBS_ENDPOINT}
       - PBS_DATASTORE=${PBS_DATASTORE}
