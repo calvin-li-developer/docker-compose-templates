@@ -5,8 +5,6 @@ services:
     hostname: ${PROXMOX_CLIENT_NAME}
     labels:
       - com.centurylinklabs.watchtower.enable=false
-    depends_on:
-      - adguardhome
     environment:
       - UNENCRYPTED=${UNENCRYPTED}
       - PBS_ENDPOINT=${PBS_ENDPOINT}
