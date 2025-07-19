@@ -1,0 +1,22 @@
+services:
+  pbs-client:
+    image: aterfax/pbs-client
+    container_name: proxmox-backup-client
+    hostname: dns-server1
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    depends_on:
+      - adguardhome
+    env_file:
+      - .env
+    dns:
+      - 10.0.53.10
+      - 10.0.53.20
+    networks:
+      - pbs-network
+    tmpfs:
+      - /tmp
+      - /run:exec
+    volumes:
+      - ./:/backups/yourbackupfolder
+    restart: unless-stopped
