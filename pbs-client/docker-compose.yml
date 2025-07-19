@@ -26,4 +26,6 @@ services:
       - /run:exec
     volumes:
       - ./:/backups/yourbackupfolder:ro # make sure its READ ONLY
+      # exclude subdir in yourbackupfolder
+      - /backups/yourbackupfolder/subfolder:ro
     restart: unless-stopped
