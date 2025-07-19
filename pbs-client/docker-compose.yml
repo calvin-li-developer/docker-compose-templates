@@ -27,5 +27,7 @@ services:
     volumes:
       - ./:/backups/yourbackupfolder:ro # make sure its READ ONLY
       # exclude subdir in yourbackupfolder
-      - /dev/null:/backups/yourbackupfolder/subfolder:ro
+      - /backups/yourbackupfolder/subfolder
+      # exclude subfile in yourbackupfolder
+      - /dev/null:/backups/yourbackupfolder/subfolder/file.txt
     restart: unless-stopped
