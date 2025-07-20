@@ -34,7 +34,7 @@ services:
     #   TZ: ${TZ}
     # networks:
     #   dns-network:
-    #     ipv4_address: 172.53.0.3
+    #     ipv4_address: 172.30.0.3
     # depends_on:
     #   - swag
     # ports:
@@ -61,7 +61,7 @@ services:
   #   hostname: unbound
   #   networks:
   #     dns-network:
-  #       ipv4_address: 172.53.0.2
+  #       ipv4_address: 172.30.0.2
   #   environment:
   #     - TZ=${TZ}
   #     - UNBOUND_UID=${PUID}
@@ -92,6 +92,6 @@ services:
 #     external: false
 #     ipam:
 #       config:
-#         - subnet: 172.53.0.0/24
-#           gateway: 172.53.0.1
+#         - subnet: 172.30.0.0/24
+#           gateway: 172.30.0.1
     
