@@ -1,0 +1,71 @@
+services:
+  # Ref Doc: https://github.com/11notes/docker-adguard
+  adguardhome:
+    image: 11notes/adguard:rolling
+    read_only: true
+    container_name: adguardhome
+    environment:
+      TZ: ${TZ}
+    networks:
+      dns-network:
+        ipv4_address: 172.30.0.3
+    depends_on:
+      - swag
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+      - 80:80/tcp
+      - 443:443/tcp
+      - 853:853/tcp
+      - 853:853/udp
+    volumes:
+      - ./app-config/work:/adguard/var
+      - ./app-config/conf:/adguard/etc
+      - ./swag-config/etc/letsencrypt/live/${URL}/fullchain.pem:/certs/fullchain.pem:ro
+      - ./swag-config/etc/letsencrypt/live/${URL}/privkey.pem:/certs/privkey.pem:ro
+    tmpfs:
+      - /adguard/run:uid=1000,gid=1000
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 53
+    restart: unless-stopped
+  # Ref Doc: https://github.com/madnuttah/unbound-docker/blob/main/doc/README.md
+  unbound:
+    container_name: unbound
+    image: madnuttah/unbound:latest
+    hostname: unbound
+    networks:
+      dns-network:
+        ipv4_address: 172.30.0.2
+    environment:
+      - TZ=${TZ}
+      - UNBOUND_UID=${PUID}
+      - UNBOUND_GID=${PGID}
+      - HEALTHCHECK_PORT=${HEALTHCHECK_PORT}
+      - EXTENDED_HEALTHCHECK=${EXTENDED_HEALTHCHECK}
+      - EXTENDED_HEALTHCHECK_DOMAIN=${EXTENDED_HEALTHCHECK_DOMAIN}
+      - DISABLE_SET_PERMS=${DISABLE_SET_PERMS}
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    volumes:
+      - ./unbound-config/unbound.conf:/usr/local/unbound/unbound.conf:rw
+      - ./unbound-config/conf.d/:/usr/local/unbound/conf.d/:rw
+      - ./unbound-config/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
+      - ./unbound-config/zones.d/:/usr/local/unbound/zones.d/:rw
+    restart: unless-stopped
+    healthcheck:
+      test: /usr/local/unbound/sbin/healthcheck.sh
+      interval: 60s
+      retries: 5
+      start_period: 15s
+      timeout: 30s
+
+networks:
+  dns-network:
+    driver: bridge
+    name: dns-network
+    external: false
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+    

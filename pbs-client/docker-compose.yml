@@ -8,7 +8,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
       - UNENCRYPTED=${UNENCRYPTED}
       - PBS_ENDPOINT=${PBS_ENDPOINT}
       - PBS_DATASTORE=${PBS_DATASTORE}
@@ -25,6 +24,10 @@ services:
       - /tmp
       - /run:exec
     volumes:
+      # Timezone
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      # Backup Config
       - ./:/backups/yourbackupfolder:ro # make sure its READ ONLY
       # exclude subdir in yourbackupfolder
       - /backups/yourbackupfolder/subfolder
