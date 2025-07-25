@@ -1,0 +1,25 @@
+services:
+  # Ref Doc: https://github.com/linuxserver/docker-adguardhome-sync
+  adguardhome-sync:
+    image: lscr.io/linuxserver/adguardhome-sync:latest
+    container_name: adguardhome-sync
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - ORIGIN_URL=${ORIGIN_URL}
+      - ORIGIN_USERNAME=${ORIGIN_USERNAME}
+      - ORIGIN_PASSWORD=${ORIGIN_PASSWORD}
+      - REPLICA1_URL=${REPLICA1_URL}
+      - REPLICA1_USERNAME=${REPLICA1_USERNAME}
+      - REPLICA1_PASSWORD=${REPLICA1_PASSWORD}
+      - CRON=${CRON}
+      - RUN_ON_START=${RUN_ON_START}
+      - API_PORT=${API_PORT}
+      - API_DARK_MODE=${API_DARK_MODE}
+    volumes:
+      - ./sync-config:/config
+    restart: unless-stopped
+  

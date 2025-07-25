@@ -10,18 +10,3 @@ services:
       - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/${URL}/fullchain.pem:/certs/fullchain.pem:ro
       - /home/ubuntu/docker/swag/config/etc/letsencrypt/live/${URL}/privkey.pem:/certs/privkey.pem:ro
     restart: unless-stopped
-  
-  # Ref Doc: https://github.com/linuxserver/docker-adguardhome-sync
-  adguardhome-sync: # optional for multi-instance adguardhome
-    image: lscr.io/linuxserver/adguardhome-sync:latest
-    container_name: adguardhome-sync
-    network_mode: host
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Toronto
-      - CONFIGFILE=/config/adguardhome-sync.yaml #optional
-    volumes:
-      - ./sync-config:/config
-    restart: unless-stopped
-  

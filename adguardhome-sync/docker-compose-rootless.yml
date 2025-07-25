@@ -1,0 +1,29 @@
+services:
+  # Ref Doc: https://github.com/11notes/docker-adguard-sync
+  adguardhome-sync:
+    image: 11notes/adguard-sync:rolling
+    container_name: adguardhome-sync
+    network_mode: host
+    depends_on:
+      adguardhome:
+        condition: service_healthy
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - ORIGIN_URL=${ORIGIN_URL}
+      - ORIGIN_USERNAME=${ORIGIN_USERNAME}
+      - ORIGIN_PASSWORD=${ORIGIN_PASSWORD}
+      - REPLICA1_URL=${REPLICA1_URL}
+      - REPLICA1_USERNAME=${REPLICA1_USERNAME}
+      - REPLICA1_PASSWORD=${REPLICA1_PASSWORD}
+      - CRON=${CRON}
+      - RUN_ON_START=${RUN_ON_START}
+      - API_PORT=${API_PORT}
+      - API_DARK_MODE=${API_DARK_MODE}
+    dns:
+      - 10.0.53.10
+      - 10.0.53.20
+    restart: unless-stopped
+    
