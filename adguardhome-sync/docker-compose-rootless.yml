@@ -4,6 +4,7 @@ services:
     image: 11notes/adguard-sync:rolling
     container_name: adguardhome-sync
     network_mode: host
+    read_only: true
     depends_on:
       adguardhome:
         condition: service_healthy
