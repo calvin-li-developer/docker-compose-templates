@@ -15,15 +15,18 @@ services:
       - PGID=101
       - TZ=America/Toronto
       - VERSION=latest
-    ports:
-      - 32400:32400/tcp  # Plex Web Server
-      - 8324:8324/tcp    # Plex for Roku via Plex Companion
-      - 5353:5353/udp    # Bonjour/Avahi network discovery
-      # GDM network discovery
-      - 32410:32410/udp
-      - 32412:32412/udp
-      - 32413:32413/udp
-      - 32414:32414/udp
+    network_mode: host
+    # ports:
+    #   - 32400:32400/tcp  # Plex Web Server
+    #   - 8324:8324/tcp    # Plex for Roku via Plex Companion
+    #   - 32469:32469/tcp  # Plex DLNA Server Access
+    #   - 1900:1900/udp    # Plex DLNA Server Access
+    #   - 5353:5353/udp    # Bonjour/Avahi network discovery
+    #   # GDM network discovery
+    #   - 32410:32410/udp
+    #   - 32412:32412/udp
+    #   - 32413:32413/udp
+    #   - 32414:32414/udp
     volumes:
       - /volume1/docker/plex/handbrake:/handbrake:ro
       - /volume1/docker/plex/media:/data:ro
