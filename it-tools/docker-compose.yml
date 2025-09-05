@@ -1,12 +1,18 @@
 services:
   it-tools:
     image: 'corentinth/it-tools:latest'
-    container_name: it-tools
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU}
+          memory: ${MEMORY}
     networks:
-    - public
+      - private
     restart: unless-stopped
+    container_name: it-tools
 
 # Networks public / private if not attached to host
 networks:
-  public:
-    name: ${APP_NAME}-public
+  private:
+    name: ${APP_NAME}-private
+    internal: true
