@@ -4,33 +4,77 @@ services:
     container_name: plex
     security_opt:
       - no-new-privileges=true
-    # cpuset: "0"    # Use for Synology DSM
-    # cpu_shares: 2  # Use for Synology DSM
+    networks:
+      plex-network:
+        ipv4_address: 172.20.0.99
+    ports:
+      - 32400:32400/tcp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+      - 32469:32469/tcp
+      - 1900:1900/udp
+      - 5353:5353/udp
+      - 8324:8324/tcp
     deploy:
       resources:
         limits:
-          memory: "2G"
+          memory: "12G"
     environment:
-      - PUID=1026
-      - PGID=101
-      - TZ=America/Toronto
-      - VERSION=latest
-    network_mode: host
-    # ports:
-    #   - 32400:32400/tcp  # Plex Web Server
-    #   - 8324:8324/tcp    # Plex for Roku via Plex Companion
-    #   - 32469:32469/tcp  # Plex DLNA Server Access
-    #   - 1900:1900/udp    # Plex DLNA Server Access
-    #   - 5353:5353/udp    # Bonjour/Avahi network discovery
-    #   # GDM network discovery
-    #   - 32410:32410/udp
-    #   - 32412:32412/udp
-    #   - 32413:32413/udp
-    #   - 32414:32414/udp
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERSION=${VERSION}
     volumes:
-      - /volume1/docker/plex/handbrake:/handbrake:ro
-      - /volume1/docker/plex/media:/data:ro
-      - /volume1/docker/plex/config:/config
-    devices:
-       - /dev/dri:/dev/dri # For H/W transcoding
+      - /mnt/md0/handbrake:/handbrake:ro
+      - /mnt/md0/media:/data:ro
+      - ./config:/config
     restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    networks:
+      plex-network:
+        ipv4_address: 172.20.0.200
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    read_only: true
+    command: [ "tunnel", "run", "--token", "${TUNNEL_TOKEN}" ]
+    user: root
+
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - URL=${URL}
+      - SUBDOMAINS=${SUBDOMAINS}
+      - VALIDATION=${VALIDATION}
+      - DNSPLUGIN=${DNSPLUGIN}
+      - SWAG_AUTORELOAD=${SWAG_AUTORELOAD}
+      - DOCKER_MODS=${DOCKER_MODS}
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - ./swag:/config
+    networks:
+      plex-network:
+        ipv4_address: 172.20.0.100
+    restart: unless-stopped
+
+networks:
+  plex-network:
+    name: plex-network
+    external: false
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
