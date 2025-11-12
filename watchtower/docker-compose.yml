@@ -3,6 +3,7 @@ services:
     container_name: watchtower
     image: containrrr/watchtower
     environment:
+      - DOCKER_API_VERSION=${DOCKER_API_VERSION}
       - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
       - WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE}
       - WATCHTOWER_LOG_LEVEL=${WATCHTOWER_LOG_LEVEL}
@@ -17,4 +18,5 @@ services:
 networks:
   watchtower-network:
     name: watchtower-network
+
     external: false
