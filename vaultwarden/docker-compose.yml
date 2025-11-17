@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     container_name: vaultwarden
     image: vaultwarden/server:alpine
+    user: ${PUID}:${PGID}
     security_opt:
       - no-new-privileges=true
     volumes:
@@ -88,3 +89,4 @@ networks:
     external: false
     driver_opts:
       com.docker.network.bridge.name: vaultwarden_net
+
