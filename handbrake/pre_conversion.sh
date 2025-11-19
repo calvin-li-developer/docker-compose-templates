@@ -16,7 +16,8 @@ WATCH_FOLDER_MOVIES=/storage/handbrake/Movies
 WATCH_FOLDER_ANIME_MOVIES=/storage/handbrake/Anime_Movies
 WATCH_FOLDER_NSFW=/storage/handbrake/Movies_NSFW
 
-printf "[INFO(pre_conversion.sh)] => Initializing (dot folder removal) ... " && find /storage/media -type d -name '.*' -exec rm -rf {} + && printf "Done\n"
+printf "[INFO(pre_conversion.sh)] => Initializing (dot folder removal) ... " 
+find /storage/media -type d -name '.*' -exec rm -rf {} + && printf "Done\n"
 
 echo "[INFO(pre_conversion.sh)] => Running WATCH_FOLDER_MOVIES Section"
 
