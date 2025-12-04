@@ -1,0 +1,19 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ${APP_NAME}-cloudflared
+    networks:
+      - public
+      - private
+    restart: unless-stopped
+    read_only: true
+    command: [ "tunnel", "--no-autoupdate", "run", "--token" ,"${TUNNEL_ID}" ]
+    user: root
+
+# Networks public / private if not attached to host
+networks:
+  public:
+    name: ${APP_NAME}-public
+  private:
+    name: ${APP_NAME}-private
+    internal: true
