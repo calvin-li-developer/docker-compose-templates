@@ -12,3 +12,10 @@ services:
     networks:
       - private
     restart: unless-stopped
+
+
+# Networks public / private if not attached to host
+networks:
+  private:
+    name: ${APP_NAME}-private
+    internal: true
