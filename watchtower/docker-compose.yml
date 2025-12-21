@@ -1,7 +1,8 @@
+# Original Repo Archived: https://github.com/containrrr/watchtower/issues/2132
 services:
   watchtower:
     container_name: watchtower
-    image: containrrr/watchtower
+    image: nickfedor/watchtower
     environment:
       - DOCKER_API_VERSION=${DOCKER_API_VERSION}
       - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
@@ -18,5 +19,6 @@ services:
 networks:
   watchtower-network:
     name: watchtower-network
+
 
     external: false
