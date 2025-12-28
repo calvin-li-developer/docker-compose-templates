@@ -1,0 +1,97 @@
+# Ref Doc: https://docs.pangolin.net/
+name: pangolin
+networks:
+  default:
+    driver: bridge
+    name: pangolin
+services:
+  crowdsec:
+    command: -t
+    container_name: crowdsec
+    environment:
+      COLLECTIONS: crowdsecurity/traefik crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules crowdsecurity/linux crowdsecurity/iptables
+      ENROLL_INSTANCE_NAME: pangolin-crowdsec
+      ENROLL_TAGS: docker
+      GID: "${GID}"
+      PARSERS: crowdsecurity/whitelists
+    healthcheck:
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      test:
+        - CMD
+        - cscli
+        - lapi
+        - status
+      timeout: 5s
+    image: docker.io/crowdsecurity/crowdsec:latest
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=false
+    ports:
+      - 6060:6060 # Metrics port
+      - 8080:8080 # Local API port
+    restart: unless-stopped
+    volumes:
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/syslog:/var/log/syslog:ro
+      - /var/log/journal:/var/log/host:ro
+      - ./config/crowdsec:/etc/crowdsec
+      - ./config/crowdsec/db:/var/lib/crowdsec/data
+      - ./config/traefik/logs:/var/log/traefik
+  gerbil:
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    command:
+      - --reachableAt=http://gerbil:3004
+      - --generateAndSaveKeyTo=/var/config/key
+      - --remoteConfig=http://pangolin:3001/api/v1/
+    container_name: gerbil
+    depends_on:
+      pangolin:
+        condition: service_healthy
+    image: docker.io/fosrl/gerbil:latest
+    ports:
+      - 51820:51820/udp
+      - 21820:21820/udp
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./config/:/var/config
+  pangolin:
+    container_name: pangolin
+    healthcheck:
+      interval: 10s
+      retries: 15
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:3001/api/v1/
+      timeout: 10s
+    image: docker.io/fosrl/pangolin:ee-latest
+    environment:
+      - EMAIL_SMTP_PASS=${EMAIL_SMTP_PASS}
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config
+  traefik:
+    command:
+      - --configFile=/etc/traefik/traefik_config.yml
+    container_name: traefik
+    depends_on:
+      crowdsec:
+        condition: service_healthy
+      pangolin:
+        condition: service_healthy
+    image: docker.io/traefik:v3
+    environment:
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+    network_mode: service:gerbil
+    restart: unless-stopped
+    volumes:
+      - ./config/traefik:/etc/traefik:ro
+      - ./config/letsencrypt:/letsencrypt
+      - ./config/traefik/logs:/var/log/traefik
