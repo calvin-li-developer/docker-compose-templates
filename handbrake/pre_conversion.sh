@@ -52,15 +52,15 @@ if [ "$(find "$WATCH_FOLDER_MOVIES" -type f -name "*.mp4" | wc -l)" -gt 0 ] || [
     imdb_id=$(echo "$query" | jq -r '.imdbID')
     year=$(echo "$query" | jq -r '.Year')
     # Rename the file with the new format
-    echo "[INFO(pre_conversion.sh)] => Audio Count: $audio_count"
+    echo "[INFO(pre_conversion.sh)] => Audio Source Count: $audio_source_count"
     if [[ "$audio_source_count" -eq 1 ]] && [[ "$audio_channel_count" -eq 2 ]]; then
-        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) [S] {imdb-$imdb_id}.mp4"
+        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_MOVIES/$name ($year) [S] {imdb-$imdb_id}.mp4"
         mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) [S] {imdb-$imdb_id}.mp4"
     elif [[ "$audio_source_count" -eq 1 ]] && [[ "$audio_channel_count" -gt 2 ]]; then
-        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) [SR] {imdb-$imdb_id}.mp4"
+        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_MOVIES/$name ($year) [SR] {imdb-$imdb_id}.mp4"
         mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) [SR] {imdb-$imdb_id}.mp4"
     else
-        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_ANIME_MOVIES/$name ($year) {imdb-$imdb_id}.mp4"
+        echo "[INFO(pre_conversion.sh)] => mv -f $file $WATCH_FOLDER_MOVIES/$name ($year) {imdb-$imdb_id}.mp4"
         mv -f "$file" "$WATCH_FOLDER_MOVIES/$name ($year) {imdb-$imdb_id}.mp4"
     fi
   done
