@@ -83,7 +83,7 @@ services:
       - TZ=${TZ}
       - VERBOSITY=${VERBOSITY}
     volumes:
-      - ./fail2ban-config:/config
+      - ./fail2ban:/config
       - /var/log:/var/log:ro
       - ./config/log:/remotelogs/bookstack:ro
     restart: unless-stopped
@@ -96,7 +96,7 @@ services:
     restart: unless-stopped
     read_only: true
     volumes:
-      - ./cloudflared-config:/root/.cloudflared/
+      - ./cloudflared:/root/.cloudflared/
     command: [ "tunnel","--config", "/root/.cloudflared/config.yml", "run", "${TUNNEL_ID}" ]
     user: root
     depends_on:
